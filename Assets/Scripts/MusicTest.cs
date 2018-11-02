@@ -2,32 +2,56 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MusicTest : MonoBehaviour 
+public class MusicTest : MonoBehaviour
 {
 
-public float BPM;
-public bool[] hits;
-public AudioSource audio;
+    public float bpm = 140.0f;
+    private float bpmInSeconds;
 
-float beat_interval;
-float time;
+    private double nextTick = 0.0f;
 
-	// Use this for initialization
-	void Start () 
-	{
-		beat_interval = 60.0f / BPM;
-	}
-	
-	// Update is called once per frame
-	void Update () 
-	{
-		time += Time.deltaTime;
+    private double sampleRate = 0.0f;
 
-if(time >= beat_interval)
-{
+    public AudioSource audio;
 
-time = 0.0f;
-audio.Play();
-}
-	}
+    public bool[] beats;
+    int count = 0;
+
+    public GameObject cube;
+
+    void Start()
+    {
+        double startTick = AudioSettings.dspTime;
+        sampleRate = AudioSettings.outputSampleRate;
+        nextTick = startTick;// * sampleRate;
+        bpmInSeconds = (60.0f / bpm) / 2.0f;
+
+        audio = GetComponent<AudioSource>();
+
+        //beats = new bool[8];
+    }
+
+    private void Update()
+    {
+        if (AudioSettings.dspTime >= nextTick)
+        {
+            if (beats[count] == true)
+            {
+                audio.Play();
+                cube.GetComponent<Renderer>().material.color = Color.red;
+            }
+            else
+            {
+                cube.GetComponent<Renderer>().material.color = Color.black;
+            }
+            nextTick += bpmInSeconds;
+            count++;
+            if (count >= beats.Length)
+            {
+                count = 0;
+            }
+        }
+    }
+
+
 }
