@@ -14,7 +14,9 @@ public class SineWave : MonoBehaviour {
     public float waveLengthInSeconds = 2.0f;
 
     AudioSource audioSource;
-    int timeIndex = 0;
+    public int timeIndex = 0;
+
+    public int maxTimeIndex = 0;
 
     public float bpm = 140.0f;
     private float bpmInSeconds;
@@ -27,6 +29,8 @@ public class SineWave : MonoBehaviour {
     int count = 0;
 
     public GameObject cube;
+
+    public float num;
 
     void Start()
     {
@@ -51,27 +55,27 @@ public class SineWave : MonoBehaviour {
         {
             case "A":
                 return 110.0f;
-            case "As":
+            case "A#":
                 return 116.54f;
             case "B":
                 return 123.47f;
             case "C":
                 return 130.81f;
-            case "Cs":
+            case "C#":
                 return 138.59f;
             case "D":
                 return 146.83f;
-            case "Ds":
+            case "D#":
                 return 155.56f;
             case "E":
                 return 164.81f;
             case "F":
                 return 174.61f;
-            case "Fs":
+            case "F#":
                 return 185.0f;
             case "G":
                 return 196.0f;
-            case "Gs":
+            case "G#":
                 return 207.65f;
             case "AA":
                 return 220.0f;
@@ -79,6 +83,23 @@ public class SineWave : MonoBehaviour {
         }
 
         return 0.0f;
+    }
+
+    IEnumerator LowerVolume()
+    {
+        float time = 0.0f;
+
+        AudioSettings.dspTime
+
+
+        while (time < bpmInSeconds)
+        {
+            audioSource.volume = Mathf.Lerp(0.2f, 0.0f, time);
+
+            yield return null;
+        }
+
+        yield return null;
     }
 
     void Update()
@@ -119,6 +140,9 @@ public class SineWave : MonoBehaviour {
 
             timeIndex++;
 
+            if (timeIndex > maxTimeIndex)
+                maxTimeIndex = timeIndex;
+
             //if timeIndex gets too big, reset it to 0
             if (timeIndex >= (sampleRate * waveLengthInSeconds))
             {
@@ -130,11 +154,21 @@ public class SineWave : MonoBehaviour {
     //Creates a sinewave
     public float CreateSine(int timeIndex, float frequency, float sampleRate)
     {
-        float num = Mathf.Sin(2 * Mathf.PI * timeIndex * frequency / sampleRate);
+        
 
-        float num2 = Mathf.PerlinNoise(2.0f * Mathf.PI * timeIndex * frequency / sampleRate, 0.0f);
+        num = Mathf.Sin(2 * Mathf.PI * timeIndex * frequency / sampleRate);
 
-        return (num + num2) / 2.0f;
+        if (maxTimeIndex != 0.0f && timeIndex != 0.0f)
+        {
+            float scaleValue = timeIndex / maxTimeIndex;
+
+            //num = num * (1.0f - scaleValue);
+        }
+        //float num2 = Mathf.PerlinNoise(2.0f * Mathf.PI * timeIndex * frequency / sampleRate, 0.0f);
+
+        return num;
+
+        //return (num + num2) / 2.0f;
         //return Mathf.Sin(2 * Mathf.PI * timeIndex * frequency / sampleRate);
     }
 }
